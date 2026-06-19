@@ -1,6 +1,3 @@
-//THIS HERE IS THE FAKE TODO APPP MADE  FOR FUN
-
-
 
 import "./todo.css";
 import { useEffect, useState } from "react";
@@ -83,7 +80,7 @@ function TODO() {
     if (!user) return;
 
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/tasks/${user.id}`);
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/tasks/${user.id}`);
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(errorText || "Failed to fetch tasks");
@@ -122,7 +119,7 @@ function TODO() {
     if (!text) return;
 
     const res = await fetchWithAuth(
-      "http://localhost:3000/subtasks",
+      `${import.meta.env.VITE_API_URL}/subtasks`,
       {
         method: "POST",
         headers: {
@@ -150,7 +147,7 @@ function TODO() {
 
   async function fetchSubtasks(taskId) {
     const res = await fetchWithAuth(
-      `http://localhost:3000/subtasks/${taskId}`
+      `${import.meta.env.VITE_API_URL}/subtasks/${taskId}`
     );
 
     if (!res.ok) {
@@ -183,7 +180,7 @@ function TODO() {
     }
 
     try {
-      const res = await fetchWithAuth("http://localhost:3000/tasks", {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -221,7 +218,7 @@ function TODO() {
   async function deleteSubtask(taskId, subtaskId) {
 
     const res = await fetchWithAuth(
-      `http://localhost:3000/subtasks/${subtaskId}`,
+      `${import.meta.env.VITE_API_URL}/subtasks/${subtaskId}`,
       {
         method: "DELETE"
       }
@@ -237,7 +234,7 @@ function TODO() {
 
   async function deleteTask(taskId) {
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/tasks/${taskId}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/tasks/${taskId}`, {
         method: "DELETE",
       });
 
@@ -260,7 +257,7 @@ function TODO() {
     const newStatus = task.status === "pending" ? "completed" : "pending";
 
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/tasks/${taskId}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/tasks/${taskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -305,7 +302,7 @@ function TODO() {
   ) {
 
     const res = await fetchWithAuth(
-      `http://localhost:3000/subtasks/${subtaskId}`,
+      `${import.meta.env.VITE_API_URL}/subtasks/${subtaskId}`,
       {
         method: "PUT",
         headers: {
@@ -337,7 +334,7 @@ function TODO() {
     if (!editingTaskId || editText.trim() === "") return;
 
     try {
-      const res = await fetchWithAuth(`http://localhost:3000/tasks/${editingTaskId}`, {
+      const res = await fetchWithAuth(`${import.meta.env.VITE_API_URL}/tasks/${editingTaskId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
