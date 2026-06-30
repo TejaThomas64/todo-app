@@ -144,7 +144,7 @@ app.post("/tasks", async (req, res) => {
 
     console.log("Request body:", req.body);
 
-    
+
 
     const { user, error: authError } = await getUserFromRequest(req);
 
@@ -177,8 +177,7 @@ app.post("/tasks", async (req, res) => {
 
     console.time("email");
     try {
-        //await
-        transporter.sendMail({
+        await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: user.email,
             subject: "Task Created",
@@ -492,45 +491,49 @@ app.delete("/subtasks/:id", async (req, res) => {
 
 
 cron.schedule("0 9 * * *", async () => {
-    console.log("Checkinh remainders")
+    try {
+        console.log("Checkinh remainders")
 
-    const tommorow = new Date();
-    tommorow.setDate(tommorow.getDate() + 1);
-    const dueDate = tommorow.toISOString().split("T")[0]
-    const { data: tasks, error } = await adminSupabase
-        .from("tasks")
-        .select("*")
-        .eq("due_date", dueDate)
-        .neq("status", "completed");
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    for (const task of tasks) {
-
-        const { data: userData, error: userError } =
-            await adminSupabase.auth.admin.getUserById(
-                task.user_id
-            );
-
-        if (userError) {
-            console.error(userError);
-            continue;
+        const tommorow = new Date();
+        tommorow.setDate(tommorow.getDate() + 1);
+        const dueDate = tommorow.toISOString().split("T")[0]
+        const { data: tasks, error } = await adminSupabase
+            .from("tasks")
+            .select("*")
+            .eq("due_date", dueDate)
+            .neq("status", "completed");
+        if (error) {
+            console.error(error);
+            return;
         }
 
-        const email = userData.user.email;
+        for (const task of tasks) {
 
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Task Reminder",
-            text: `Your task "${task.text}" is due tomorrow.`,
-        });
+            const { data: userData, error: userError } =
+                await adminSupabase.auth.admin.getUserById(
+                    task.user_id
+                );
 
-        console.log(
-            `Reminder sent to ${email}`
-        );
+            if (userError) {
+                console.error(userError);
+                continue;
+            }
+
+            const email = userData.user.email;
+
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Task Reminder",
+                text: `Your task "${task.text}" is due tomorrow.`,
+            });
+
+            console.log(
+                `Reminder sent to ${email}`
+            );
+        }
+    } catch (error) {
+        console.error(error);
     }
 });
 
