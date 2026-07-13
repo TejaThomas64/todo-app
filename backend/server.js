@@ -68,9 +68,6 @@ async function getUserFromRequest(req) {
     }
     const { data, error } = await supabase.auth.getUser(token);
 
-    console.log("User:", data?.user);
-    console.log("Error:", error);
-
     return {
         user: data?.user ?? null,
         error
@@ -138,7 +135,8 @@ app.get("/dbtest", async (req, res) => {
 
 
 app.post("/tasks", async (req, res) => {
-    console.time("create task");
+    const createTimerLabel = `create task-${Date.now()}`;
+    console.time(createTimerLabel);
     const userSupabase = createUserSupabase(req);
     const { text, status, due_date, user_id } = req.body;
 
@@ -164,7 +162,7 @@ app.post("/tasks", async (req, res) => {
         .insert([{ text, status, due_date, user_id }])
         .select();
 
-    console.timeEnd("create task");
+    console.timeEnd(createTimerLabel);
     console.log("Insert data:", data);
     console.log("Insert error:", error);
 
@@ -175,7 +173,8 @@ app.post("/tasks", async (req, res) => {
     console.log("About to send email");
     console.log("Recipient:", user.email);
 
-    console.time("email");
+    const emailTimerLabel = `email-${Date.now()}`;
+    console.time(emailTimerLabel);
     try {
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
@@ -193,7 +192,7 @@ Thank you for using Todo App.
 `,
         });
 
-        console.timeEnd("email");
+        console.timeEnd(emailTimerLabel);
         console.log("Email sent ")
     } catch (mailError) {
         console.error("Email failed:", mailError);
