@@ -170,6 +170,9 @@ app.post("/tasks", async (req, res) => {
         return res.status(500).json(error);
     }
 
+    // Return the response immediately so the frontend doesn't wait for the email to send
+    res.json(data);
+
     console.log("About to send email");
     console.log("Recipient:", user.email);
 
@@ -197,8 +200,6 @@ Thank you for using Todo App.
     } catch (mailError) {
         console.error("Email failed:", mailError);
     }
-
-    res.json(data);
 });
 
 app.put("/tasks/:id", async (req, res) => {
